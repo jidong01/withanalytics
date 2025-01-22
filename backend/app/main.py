@@ -1,12 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .api import channel
+import os
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "https://withanalytics.vercel.app",
+        "http://localhost:3000"  # 로컬 개발용
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
