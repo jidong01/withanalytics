@@ -6,11 +6,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://withanalytics.vercel.app",
-        "https://*.vercel.app",  # 모든 Vercel 도메인 허용
-        "http://localhost:3000"  # 로컬 개발용
-    ],
+    allow_origins=["*"],  # 모든 도메인 허용
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
