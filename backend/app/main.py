@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api import channel  # video, comment는 아직 없으므로 제거
+from .api import channel
 
 app = FastAPI()
 

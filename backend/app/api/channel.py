@@ -7,19 +7,21 @@ router = APIRouter()
 youtube_service = YouTubeService()
 openai_service = OpenAIService()
 
-@router.get("/channel/{channel_id}")
-async def get_channel_info(channel_id: str) -> Dict[str, Any]:
-    channel_info = await youtube_service.get_channel_info(channel_id)
-    if not channel_info:
-        raise HTTPException(status_code=404, detail="Channel not found")
-    return channel_info
+@router.get("/{channel_id}")
+async def get_channel_info(channel_id: str):
+    try:
+        channel_info = await youtube_service.get_channel_info(channel_id)
+        return channel_info
+    except Exception as e:
+        return {"error": str(e)}
 
-@router.get("/channel/{channel_id}/videos")
+@router.get("/{channel_id}/videos")
 async def get_channel_videos(channel_id: str):
-    videos = await youtube_service.get_channel_videos(channel_id)
-    if not videos:
-        raise HTTPException(status_code=404, detail="Videos not found")
-    return videos
+    try:
+        videos = await youtube_service.get_channel_videos(channel_id)
+        return videos
+    except Exception as e:
+        return {"error": str(e)}
 
 @router.get("/videos/{video_id}/comments")
 async def get_video_comments(video_id: str):
