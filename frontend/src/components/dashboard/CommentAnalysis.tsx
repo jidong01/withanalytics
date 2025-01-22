@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { analyzeVideoComments } from '@/lib/api';
 
@@ -50,42 +50,60 @@ export default function CommentAnalysis({ videoId }: { videoId: string }) {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await analyzeVideoComments(videoId);
       
-      console.log('Received data:', data);
+      // 캐시 키 생성
+      const cacheKey = `comment-analysis-${videoId}`;
+      
+      // 캐시된 데이터 확인
+      const cachedData = sessionStorage.getItem(cacheKey);
+      if (cachedData) {
+        setAnalysis(JSON.parse(cachedData));
+        setIsLoading(false);
+        return;
+      }
 
+      const data = await analyzeVideoComments(videoId);
       const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
-
-      const formattedData: AnalysisResult = {
-        keywords: parsedData.keywords || [],
-        sentiment: {
-          positive: parsedData.sentiment?.positive || 0,
-          negative: parsedData.sentiment?.negative || 0,
-          neutral: parsedData.sentiment?.neutral || 0,
-          examples: {
-            positive: parsedData.sentiment?.examples?.positive || [],
-            negative: parsedData.sentiment?.examples?.negative || [],
-            neutral: parsedData.sentiment?.examples?.neutral || []
-          }
-        },
-        categories: parsedData.categories || [],
-        feedback: parsedData.feedback || []
-      };
-
-      setAnalysis(formattedData);
+      
+      // 데이터 캐싱
+      sessionStorage.setItem(cacheKey, JSON.stringify(parsedData));
+      setAnalysis(parsedData);
     } catch (err) {
-      console.error('Analysis error:', err);
-      setError('댓글 분석 중 오류가 발생했습니다.');
+      setError(err instanceof Error ? err.message : '분석 중 오류가 발생했습니다');
     } finally {
       setIsLoading(false);
     }
   };
 
+  // 감정 분석 데이터 메모이제이션
+  const sentimentData = useMemo(() => {
+    if (!analysis) return null;
+    
+    return {
+      positive: (analysis.sentiment.positive).toFixed(1),
+      negative: (analysis.sentiment.negative).toFixed(1),
+      neutral: (analysis.sentiment.neutral).toFixed(1)
+    };
+  }, [analysis]);
+
+  // 차트 데이터 메모이제이션
+  const chartData = useMemo(() => {
+    if (!analysis?.sentiment) return [];
+    
+    return [
+      { name: '긍정', value: analysis.sentiment.positive },
+      { name: '부정', value: analysis.sentiment.negative },
+      { name: '중립', value: analysis.sentiment.neutral }
+    ];
+  }, [analysis]);
+
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <div className="flex items-center justify-center py-8">
-          <div className="text-lg text-gray-600">댓글을 분석하고 있습니다...</div>
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500" />
+          <p className="text-gray-600 text-lg">댓글을 분석하고 있습니다...</p>
+          <p className="text-gray-500 text-sm">잠시만 기다려주세요</p>
         </div>
       </div>
     );
@@ -93,14 +111,16 @@ export default function CommentAnalysis({ videoId }: { videoId: string }) {
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <div className="text-red-500">{error}</div>
-        <button
-          onClick={fetchAnalysis}
-          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          다시 시도
-        </button>
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+          <div className="text-red-500">
+            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <p className="text-red-600 text-lg font-medium">분석 중 오류가 발생했습니다</p>
+          <p className="text-gray-500 text-sm">{error}</p>
+        </div>
       </div>
     );
   }
@@ -149,7 +169,7 @@ export default function CommentAnalysis({ videoId }: { videoId: string }) {
               <div className="bg-green-50 rounded-lg p-4">
                 <p className="text-green-600 font-semibold">긍정적 반응</p>
                 <p className="text-2xl font-bold text-green-700">
-                  {(analysis.sentiment.positive * 100).toFixed(1)}%
+                  {sentimentData?.positive}%
                 </p>
                 <div className="mt-2">
                   <p className="text-sm text-green-600">예시:</p>
@@ -163,7 +183,7 @@ export default function CommentAnalysis({ videoId }: { videoId: string }) {
               <div className="bg-red-50 rounded-lg p-4">
                 <p className="text-red-600 font-semibold">부정적인 반응</p>
                 <p className="text-2xl font-bold text-red-700">
-                  {(analysis.sentiment.negative * 100).toFixed(1)}%
+                  {sentimentData?.negative}%
                 </p>
                 <div className="mt-2">
                   <p className="text-sm text-red-600">예시:</p>
@@ -177,7 +197,7 @@ export default function CommentAnalysis({ videoId }: { videoId: string }) {
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-gray-600 font-semibold">중립적인 반응</p>
                 <p className="text-2xl font-bold text-gray-700">
-                  {(analysis.sentiment.neutral * 100).toFixed(1)}%
+                  {sentimentData?.neutral}%
                 </p>
                 <div className="mt-2">
                   <p className="text-sm text-gray-600">예시:</p>

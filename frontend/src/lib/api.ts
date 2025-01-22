@@ -2,7 +2,35 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
+  timeout: 300000,
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
+
+// 디버깅을 위한 인터셉터 추가
+api.interceptors.request.use(
+  config => {
+    console.log('API Request:', config.url);
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  }
+);
+
+api.interceptors.response.use(
+  response => response,
+  error => {
+    console.error('API Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      message: error.message
+    });
+    return Promise.reject(error);
+  }
+);
 
 export const getChannelInfo = async (channelId: string) => {
   try {
@@ -26,7 +54,8 @@ export const getChannelVideos = async (channelId: string) => {
 
 export const getVideoComments = async (videoId: string) => {
   try {
-    const response = await api.get(`/videos/${videoId}/comments`);
+    // 백엔드 라우트와 일치하도록 수정
+    const response = await api.get(`/channel/videos/${videoId}/comments`);
     return response.data;
   } catch (error) {
     console.error('Error fetching video comments:', error);
@@ -36,7 +65,8 @@ export const getVideoComments = async (videoId: string) => {
 
 export const analyzeVideoComments = async (videoId: string) => {
   try {
-    const response = await api.get(`/videos/${videoId}/analysis`);
+    // 백엔드 라우트와 일치하도록 수정
+    const response = await api.get(`/channel/videos/${videoId}/analysis`);
     return response.data;
   } catch (error) {
     console.error('Error analyzing video comments:', error);
@@ -56,7 +86,8 @@ export const getChannelComments = async (channelId: string) => {
 
 export const getChartAnalysis = async (chartType: string, data: any) => {
   try {
-    const response = await api.post('/analysis/chart', {
+    // 백엔드 라우트와 일치하도록 수정
+    const response = await api.post('/channel/analysis/chart', {
       chart_type: chartType,
       data: data
     });

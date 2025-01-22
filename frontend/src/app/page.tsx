@@ -54,14 +54,14 @@ export default function Home() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="channelUrl" className="block text-sm font-medium text-gray-700 mb-1">
-                채널 URL 입력
+                채널 ID 입력
               </label>
               <input
                 type="text"
                 id="channelUrl"
                 value={channelUrl}
                 onChange={(e) => setChannelUrl(e.target.value)}
-                placeholder="https://www.youtube.com/channel/UC..."
+                placeholder="UC..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 disabled={isLoading}
               />
@@ -88,11 +88,18 @@ export default function Home() {
           </form>
 
           <div className="mt-6 text-sm text-gray-600">
-            <p className="mb-2">입력 가능한 형식:</p>
+            <p className="mb-2">채널 ID 찾기:</p>
             <ul className="list-disc list-inside space-y-1">
-              <li>채널 URL (https://www.youtube.com/channel/UC...)</li>
-              <li>채널 ID (UC...)</li>
-              <li>커스텀 URL (https://www.youtube.com/@...)</li>
+              <li>
+                <a 
+                  href="https://ytlarge.com/youtube/channel-id-finder/ko" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline"
+                >
+                  https://ytlarge.com/youtube/channel-id-finder/ko
+                </a>
+              </li>
             </ul>
           </div>
         </div>

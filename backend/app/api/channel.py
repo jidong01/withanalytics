@@ -48,7 +48,7 @@ async def analyze_video_comments(video_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/channel/{channel_id}/comments")
+@router.get("/{channel_id}/comments")
 async def get_channel_comments(channel_id: str):
     comments = await youtube_service.get_channel_comments(channel_id)
     if not comments:
