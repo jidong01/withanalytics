@@ -91,9 +91,9 @@ export default function CommentAnalysis({ videoId }: { videoId: string }) {
     if (!analysis?.sentiment) return [];
     
     return [
-      { name: '긍정', value: analysis.sentiment.positive },
-      { name: '부정', value: analysis.sentiment.negative },
-      { name: '중립', value: analysis.sentiment.neutral }
+      { name: '긍정', value: analysis.sentiment.positive *100 },
+      { name: '부정', value: analysis.sentiment.negative *100 },
+      { name: '중립', value: analysis.sentiment.neutral *100 }
     ];
   }, [analysis]);
 
