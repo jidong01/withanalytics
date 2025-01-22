@@ -8,7 +8,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://withanalytics.vercel.app",
-        "https://withanalytics-cul2ydbzq-jidongs-projects-6f8485e9.vercel.app",
+        "https://*.vercel.app",  # 모든 Vercel 도메인 허용
         "http://localhost:3000"  # 로컬 개발용
     ],
     allow_credentials=True,
