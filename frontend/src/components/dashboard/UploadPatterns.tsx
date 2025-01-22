@@ -30,7 +30,7 @@ import {
     videos: Video[];
   }
   
-  export default function UploadPatterns({ videos }: UploadPatternsProps) {
+  export default function UploadPatterns({ videos }: { videos: Video[] }) {
     // 요일별 통계
     const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
     const dayStats = videos.reduce((acc: Record<number, { count: number, totalViews: number }>, video) => {
