@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api import channel, video, comment
-import os
+from .api import channel  # video, comment는 아직 없으므로 제거
 
 app = FastAPI()
 
@@ -17,8 +16,6 @@ app.add_middleware(
 )
 
 app.include_router(channel.router, prefix="/api/channel", tags=["channel"])
-app.include_router(video.router, prefix="/api/video", tags=["video"])
-app.include_router(comment.router, prefix="/api/comment", tags=["comment"])
 
 @app.get("/")
 async def root():
