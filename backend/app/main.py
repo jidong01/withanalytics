@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api import channel
+from .api import channel, video, comment
 import os
 
 app = FastAPI()
@@ -16,8 +16,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(channel.router, prefix="/api")
+app.include_router(channel.router, prefix="/api/channel", tags=["channel"])
+app.include_router(video.router, prefix="/api/video", tags=["video"])
+app.include_router(comment.router, prefix="/api/comment", tags=["comment"])
 
 @app.get("/")
 async def root():
-    return {"message": "YouTube Analyzer API"} 
+    return {"message": "YouTube Analytics API"} 
