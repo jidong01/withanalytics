@@ -200,56 +200,26 @@ export default function CoreFansAnalysis({ channelId, channelTitle }: CoreFansAn
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-lg font-semibold mb-4">핵심 팬 분석</h2>
-      <div className="space-y-6">
-        {coreFans.map((fan, index) => (
-          <div key={fan.author} className="border-b last:border-b-0 pb-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-lg font-medium">{fan.author}</span>
-                  {index < 3 && (
-                    <span className="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
-                      Top {index + 1}
-                    </span>
-                  )}
+      <h2 className="text-xl font-bold mb-6">핵심 시청자 분석</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h3 className="text-lg font-semibold mb-4">활발한 댓글 작성자</h3>
+          <div className="space-y-4">
+            {coreFans.map((fan, index) => (
+              <div key={index} className="bg-gray-50 rounded-lg p-4">
+                <div className="flex justify-between items-center">
+                  <p className="font-semibold">{fan.author}</p>
+                  <p className="text-sm text-gray-600">{fan.commentCount}개의 댓글</p>
                 </div>
-                <div className="text-sm text-gray-600 mt-1">
-                  댓글 {fan.commentCount}개 • 받은 좋아요 {fan.totalLikes}개
-                </div>
-                <div className="text-sm text-gray-500 mt-1">
-                  최근 영상 참여율: {(fan.engagementRate * 100).toFixed(1)}%
-                </div>
-                <div className="text-sm text-gray-500 mt-1">
-                  활동 기간: {new Date(fan.firstActivityDate).toLocaleDateString()} ~ {new Date(fan.lastActivityDate).toLocaleDateString()}
-                  {' '}
-                  <span className="text-gray-400">
-                    ({Math.ceil((new Date(fan.lastActivityDate).getTime() - new Date(fan.firstActivityDate).getTime()) / (1000 * 60 * 60 * 24))}일)
-                  </span>
-                </div>
-                <button
-                  onClick={() => setSelectedFan(fan)}
-                  className="mt-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
-                >
-                  모든 댓글 보기 →
-                </button>
+                <p className="text-sm text-gray-500 mt-2">
+                  최근 댓글: {fan.lastComment.length > 100 ? fan.lastComment.slice(0, 100) + '...' : fan.lastComment}
+                </p>
               </div>
-            </div>
-            <div className="mt-2 text-sm text-gray-600 italic">
-              "{fan.lastComment.length > 100 
-                ? fan.lastComment.slice(0, 100) + '...' 
-                : fan.lastComment}"
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
+        {/* ... 나머지 분석 컴포넌트들 ... */}
       </div>
-
-      {selectedFan && (
-        <FanCommentsModal
-          fan={selectedFan}
-          onClose={() => setSelectedFan(null)}
-        />
-      )}
     </div>
   );
 } 

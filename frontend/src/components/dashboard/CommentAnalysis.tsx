@@ -118,81 +118,109 @@ export default function CommentAnalysis({ videoId }: { videoId: string }) {
   const SENTIMENT_COLORS = ['#00C49F', '#FF8042', '#FFBB28'];
 
   return (
-    <div className="space-y-8">
-      {/* 대시보드 요약 */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-xl font-bold mb-6 text-gray-900">댓글 분석 대시보드</h2>
-
-        {/* 키워드 요약 */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">주요 키워드</h3>
-          <div className="flex flex-wrap gap-2">
-            {analysis.keywords.map((keyword, index) => (
-              <span
-                key={index}
-                className="bg-blue-100 px-3 py-1 rounded-full text-blue-800"
-              >
-                {keyword.word} ({keyword.count}회)
-              </span>
-            ))}
+    <div className="space-y-6">
+      {analysis ? (
+        <>
+          {/* 키워드 분석 */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-semibold mb-4">주요 키워드</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {analysis.keywords.map((keyword, index) => (
+                <div key={index} className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-lg font-semibold">{keyword.word}</p>
+                  <p className="text-sm text-gray-600">언급 횟수: {keyword.count}회</p>
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-500">예시 댓글:</p>
+                    <ul className="text-sm">
+                      {keyword.examples.slice(0, 2).map((example, i) => (
+                        <li key={i} className="text-gray-600 mt-1">{example}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* 감정 분석 차트 */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">감정 분석</h3>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={[
-                    { name: '긍정', value: analysis.sentiment.positive },
-                    { name: '부정', value: analysis.sentiment.negative },
-                    { name: '중립', value: analysis.sentiment.neutral }
-                  ]}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {SENTIMENT_COLORS.map((color, index) => (
-                    <Cell key={`cell-${index}`} fill={color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* 주제 요약 */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">주요 주제</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {analysis.categories.map((category, index) => (
-              <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                <span className="text-gray-800">{category.name}</span>
+          {/* 감정 분석 */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-semibold mb-4">감정 분석</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-green-50 rounded-lg p-4">
+                <p className="text-green-600 font-semibold">긍정적 반응</p>
+                <p className="text-2xl font-bold text-green-700">
+                  {(analysis.sentiment.positive * 100).toFixed(1)}%
+                </p>
+                <div className="mt-2">
+                  <p className="text-sm text-green-600">예시:</p>
+                  <ul className="text-sm">
+                    {analysis.sentiment.examples.positive.slice(0, 2).map((example, i) => (
+                      <li key={i} className="text-green-600 mt-1">{example}</li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 피드백 요약 */}
-        <div>
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">주요 피드백</h3>
-          <div className="space-y-2">
-            {analysis.feedback.map((item, index) => (
-              <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                <span className="font-medium text-gray-800">{item.type}:</span>
-                <span className="text-gray-700 ml-2">{item.content}</span>
+              <div className="bg-red-50 rounded-lg p-4">
+                <p className="text-red-600 font-semibold">부정적인 반응</p>
+                <p className="text-2xl font-bold text-red-700">
+                  {(analysis.sentiment.negative * 100).toFixed(1)}%
+                </p>
+                <div className="mt-2">
+                  <p className="text-sm text-red-600">예시:</p>
+                  <ul className="text-sm">
+                    {analysis.sentiment.examples.negative.slice(0, 2).map((example, i) => (
+                      <li key={i} className="text-red-600 mt-1">{example}</li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-            ))}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-gray-600 font-semibold">중립적인 반응</p>
+                <p className="text-2xl font-bold text-gray-700">
+                  {(analysis.sentiment.neutral * 100).toFixed(1)}%
+                </p>
+                <div className="mt-2">
+                  <p className="text-sm text-gray-600">예시:</p>
+                  <ul className="text-sm">
+                    {analysis.sentiment.examples.neutral.slice(0, 2).map((example, i) => (
+                      <li key={i} className="text-gray-600 mt-1">{example}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
+
+          {/* 주제 요약 */}
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-xl font-bold mb-6 text-gray-900">주요 주제</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {analysis.categories.map((category, index) => (
+                <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                  <span className="text-gray-800">{category.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 피드백 요약 */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4 text-gray-900">주요 피드백</h3>
+            <div className="space-y-2">
+              {analysis.feedback.map((item, index) => (
+                <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                  <span className="font-medium text-gray-800">{item.type}:</span>
+                  <span className="text-gray-700 ml-2">{item.content}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-gray-600">분석 중입니다...</p>
         </div>
-      </div>
+      )}
 
       {/* 상세 댓글 분석 */}
       <div className="bg-white rounded-lg shadow-lg p-6">
